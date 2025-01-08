@@ -1,0 +1,42 @@
+1. variable balancedPriority is declared but not used
+
+2. two nested if conditions:
+    if (lhsPriority > -99) {
+        if (balance.amount <= 0) {
+        return true;
+        }
+    }
+we can combine 2 Conditions and Return a Result as below:
+ return lhsPriority > -99 && balance.amount <= 0
+
+3. Calling sortedBalances.map() twice. Once to formattedBalances and once to render rows. But formattedBalances is not used
+So thaat can remove it
+
+4. Loop logic in getPriority: determines the value based on the passed string so can be restructured into a lookup table or map
+const priorityLookup: Record<string, number> = {
+    Osmosis: 100,
+    Ethereum: 50,
+    Arbitrum: 30,
+    Zilliqa: 20,
+    Neo: 20,
+  };
+
+const getPriority = (blockchain: string): number => priorityLookup[blockchain] || -99;
+
+5. variable rows includes function map() line. May be can use useMemo to avoid unnecessary recalculation sortedBalances every time we render.
+const rows = useMemo(() => {
+    return sortedBalances.map((balance: WalletBalance) => {
+      const usdValue = prices[balance.currency] * balance.amount;
+      return (
+        <WalletRow
+          className={classes.row}
+          key={balance.currency} // Dùng key duy nhất
+          amount={balance.amount}
+          usdValue={usdValue}
+          formattedAmount={balance.amount.toFixed()}
+        />
+      );
+    });
+  }, [sortedBalances, prices]);
+
+
